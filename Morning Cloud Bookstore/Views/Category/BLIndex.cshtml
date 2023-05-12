@@ -1,0 +1,196 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+    <link href="~/Content/lib/layui-v2.6.3/css/layui.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #content {
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div>
+            <el-tabs type="border-card">
+                <el-tab-pane>
+                    <span slot="label"><i class="el-icon-notebook-1"></i> 书籍大类别</span>
+                    @* 内容 *@
+                    <div id="content">
+                        <el-row>
+                            <el-button type="primary" v-on:click="Adddialog = true">新增大类别</el-button>
+                        </el-row>
+                        <hr />
+                        <el-row>
+                            <el-table :data="tableData" style="width: 100%" :stripe="true" :border="true" size="small ">
+                                <el-table-column fixed prop="BLID" label="ID" width="150">
+                                </el-table-column>
+                                <el-table-column fixed prop="BLName" label="大类别名称" width="150">
+                                </el-table-column>
+                                <el-table-column label="操作">
+                                    <template slot-scope="scope">
+                                        <el-button size="mini" v-on:click="Edit(scope.row)">编辑</el-button>
+                                        <el-button size="mini" type="danger" v-on:click="Delete(scope.row)">删除</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-row>
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
+        </div>
+
+        @* 新增 *@
+        <el-dialog title="新增" :visible.sync="Adddialog">
+            <el-form :model="form">
+                <el-form-item label="大类别名称" :label-width="formLabelWidth">
+                    <el-input v-model="form.BLName" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button v-on:click="Adddialog = false">取 消</el-button>
+                <el-button type="primary" v-on:click="Save">确 定</el-button>
+            </div>
+        </el-dialog>
+
+        @* 编辑 *@
+        <el-dialog title="编辑" :visible.sync="Editdialog">
+            <el-form :model="form">
+                <el-form-item label="大类别名称" :label-width="formLabelWidth">
+                    <el-input v-model="form.BLName" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button v-on:click="Editdialog = false">取 消</el-button>
+                <el-button type="primary" v-on:click="EditSave">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+</body>
+</html>
+<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            tableData: [],
+
+            Adddialog: false,
+            Editdialog: false,
+
+            //大类别对象
+            form: {
+                BLID: '',
+                BLName: ''
+            },
+
+            formLabelWidth: '120px'
+        },
+        //初始数据加载
+        created() {
+            this.getBLCategory()
+        },
+        methods: {
+            //修改
+            Edit(row) {
+                this.Editdialog = true;
+                this.form.BLID = row.BLID;
+                this.form.BLName = row.BLName;
+                console.log(row.BLName);
+            },
+            //修改保存
+            EditSave() {
+                var obj = new Object();
+                obj.BLID = this.form.BLID;
+                obj.BLName = this.form.BLName;
+                axios.post("EditBLCategory", { bl: obj }, {
+                    headers: {
+                    }
+                }).then(res => {
+                    this.$message({
+                        type: 'success',
+                        message: '修改成功!'
+                    });
+                    this.tableData = res.data,
+                        this.Editdialog = false;
+                })
+            },
+            //删除
+            Delete(row) {
+                this.$confirm('是否确定删除?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post("DelBLCategory", { id: row.BLID }, {
+                        headers: {
+
+                        }
+                    }).then(res => {
+                        if (res.data.num === -1) {
+                            this.$message({
+                                type: 'error',
+                                message: '已关联的数据不能删除'
+                            });
+                        } else {
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                        }
+                        this.tableData = res.data.list
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+
+            },
+            //获取所以大类别
+            getBLCategory() {
+                axios.get("GetBLCategoryAll", {}, {
+                    headers: {
+                    }
+                }).then(res => {
+                    //复制给tableDate
+                    this.tableData = res.data
+                })
+            },
+            //新增保存
+            Save() {
+                var name = this.form.BLName;
+                axios.post("AddBLCategory", { BLName: name }, {
+                    headers: {
+                    }
+                }).then(res => {
+                    this.$message({
+                        type: 'success',
+                        message: '新增成功!'
+                    });
+                    this.tableData = res.data,
+                        this.Adddialog = false;
+                })
+            }
+        }
+    })
+</script>
+

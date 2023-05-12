@@ -1,0 +1,110 @@
+﻿
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/userBook_1.cshtml";
+}
+
+<!--中部开始-->
+<div>
+    <div style="border:1px solid #CCCCCC;height:400px">
+        <div style="float:left;margin:10px 10px;width:330px">
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <img src="~/images/login.png" />
+                    </td>
+                </tr>
+                <tr style="height:30px">
+                    <td style="text-align:right">用户名</td>
+                    <td style="padding-left:5px">
+                        <input type="text" id="name" />
+                    </td>
+                </tr>
+                <tr style="height:30px">
+                    <td style="text-align:right">密码</td>
+                    <td style="padding-left:5px">
+                        <input type="password" id="pwd" />
+                    </td>
+                </tr>
+                <tr style="height:30px">
+                    <td></td>
+                    <td>
+                        <input type="image" id="tijiao" src="~/images/logBtn.png" style="border-width:0px;" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="float:right;margin:10px 10px">
+            <table>
+                <tr>
+                    <td>
+                        <img src="~/images/regis.png" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>如果您不是会员，请注册</strong>  <p />
+
+                        <strong class="f4">友情提示：</strong><p />
+
+                        不注册为会员也可在本店购买商品<p />
+
+                        但注册之后您可以：<p />
+
+                        1. 保存您的个人资料<p />
+
+                        2. 收藏您关注的商品<p />
+
+                        3. 享受会员积分制度<p />
+
+                        4. 订阅本店商品信息  <p />
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="Region.html"><img src="~/images/regisBtn.png" style="border:0px" /></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</div>
+<!--中部结束-->
+<script>
+    $("#tijiao").click(function () {
+        var name = $("#name").val()
+        var pwd = $("#pwd").val()
+        $.ajax({
+            type: "post",
+            url: "/UserBook/YanZ",
+            data: { name: name, pwd: pwd },
+            success: function (d) {
+                //
+                if (d == 1) {
+                    location.href = "/UserBook/Index"
+                }
+                if (d == -1) {
+                    layer.msg('密码错误', {
+                        icon: 2,
+                        time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                    }, function () {
+                        //do something
+                    });
+                }
+                if (d == 0) {
+                    layer.msg('用户不存在', {
+                        icon: 2,
+                        time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                    }, function () {
+                        //do something
+                    });
+                }
+            },
+            error: function (e) {
+                //
+            }
+        })
+    })
+</script>

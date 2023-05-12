@@ -1,0 +1,106 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>GrZx</title>
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <el-tabs type="border-card">
+            <el-tab-pane label="个人信息">
+                <el-descriptions title="个人信息">
+                    <el-descriptions-item label="编号">{{ AdminForm.AdminID }}</el-descriptions-item>
+                    <el-descriptions-item label="用户名">{{ AdminForm.AdminUser }}</el-descriptions-item>
+                    <el-descriptions-item label="备注">
+                        <el-tag size="small">管理员</el-tag>
+                    </el-descriptions-item>
+                </el-descriptions>
+            </el-tab-pane>
+            <el-tab-pane label="修改密码">
+                <el-form label-width="80px" :model="form">
+                    <el-form-item label="原密码">
+                        <el-input v-model="form.oldpwd" show-password placeholder="请输入旧密码"></el-input>
+                    </el-form-item>
+                    <el-form-item label="新密码">
+                        <el-input v-model="form.newpwd" show-password placeholder="请输入新密码"></el-input>
+                    </el-form-item>
+                    <el-form-item label="确认密码">
+                        <el-input v-model="form.okpwd" show-password placeholder="再次输入密码"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" v-on:click="submitForm">提交</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+</body>
+</html>
+<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            AdminForm: {
+                AdminID: "",
+                AdminUser: "",
+            },
+            form: {
+                oldpwd: "",
+                newpwd: "",
+                okpwd:""
+            }
+        },
+        created() {
+            this.getAdminByid()
+        },
+        methods: {
+            getAdminByid() {
+                axios.post("GetAdminsById")
+                    .then(res => {
+                        this.AdminForm.AdminID = res.data.AdminID;
+                        this.AdminForm.AdminUser = res.data.AdminUser;
+                })
+            },
+            submitForm() {
+                console.log(this.form.oldpwd )
+                console.log(this.form.newpwd)
+                console.log(this.form.okpwd)
+
+                axios.post("Getoldpwd", { pwd: this.form.oldpwd })
+                    .then(res => {
+                        if (res.data) {
+                            if (this.form.newpwd == this.form.okpwd) {
+                                axios.post("Editpwd", { pwd: this.form.okpwd })
+                                    .then(res => {
+                                        if (res.data > 0) {
+                                            this.$message({
+                                                showClose: true,
+                                                message: '修改成功',
+                                                type: 'success'
+                                            });
+                                        } else {
+                                            this.$message.error('不得与原密码相同');
+                                        }
+                                    })
+                            } else {
+                                this.$message.error('两次密码输入不一致');
+                            }
+                        } else {
+                            this.$message.error('原密码错误');
+                        }
+                    })
+            }
+        }
+    })
+</script>

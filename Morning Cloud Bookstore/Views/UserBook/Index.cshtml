@@ -1,0 +1,95 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/userBook.cshtml";
+}
+
+<!--中部开始-->
+<div id="mainDiv">
+
+    <div class="redAll" style="float: right; width: 100%">
+        <div class="redTitle" style="float:right;width:725px">秒杀专区</div>
+        @foreach (var item in Session["Buylist"] as List<Morning_Cloud_Bookstore.Models.Model.BooksModel>)
+        {
+            <div style="float: left;margin:5px 5px;overflow:hidden">
+
+                <div style="width:135px;text-align:center">
+                    <a href="/UserBook/BookPage?id=@item.BookID">
+                        <img src="@item.ImgUrl" style="border:1px solid #CDCECE;width:80px;height:110px" />
+                    </a>
+                </div>
+                <div style="height:25px;line-height:15px;text-align:center">
+                    <a href="/UserBook/BookPage?id=@item.BookID" title="@item.BookTitle"> @item.BookTitle </a>
+                </div>
+                <div style="height: 15px; line-height: 15px; text-align: center">
+                    <font style="text-decoration: line-through">@item.BookPrice</font>
+                </div>
+                <div style="height: 15px; line-height: 15px; text-align: center">
+                    <font color="#FF7126" style="font-weight:bold">@item.BookMoney </font>
+                </div>
+                <div style="text-align: center">
+                    @*<a href="/UserBook/GouWuChe?id=@item.BookID" >*@
+                        <img src="~/images/goumaismall.jpg" bookid="@item.BookID" class="gwc" style="cursor:pointer" />
+                    @*</a>*@
+                </div>
+
+            </div>
+
+        }
+        </div>
+    <div style="clear:both"></div>
+    <p></p>
+    <div class="redAll" style="float: right; width: 100%">
+        <div class="redTitle" style="float:right;width:725px">热门推荐</div>
+        @foreach (var item in Session["Hotlist"] as List<Morning_Cloud_Bookstore.Models.Model.BooksModel>)
+        {
+            <div style="float: left;margin-top:5px;margin-left:7px">
+                <div style="width:130px;text-align:center">
+                    <a href="/UserBook/BookPage?id=@item.BookID">
+                        <img src="@item.ImgUrl" style="border:1px solid #CDCECE;width:120px;height:170px" />
+                    </a>
+                </div>
+                <div style="margin:5px 5px;width:130px;text-align:center">
+                    <a href="/UserBook/BookPage?id=@item.BookID" title="@item.BookTitle">@item.BookTitle</a>
+                </div>
+                <div style="margin:5px 5px;width:130px;text-align:center">
+                    <font color="#999999" style="text-decoration:line-through">@item.BookPrice  </font>
+                </div>
+                <div style="margin:5px 5px;width:130px;text-align:center">
+                    <font color="#FF7126" style="font-weight:bold">@item.BookMoney </font>
+                </div>
+                <div style="margin:5px 5px;width:130px;text-align:center">
+                    @*<a href="/UserBook/GouWuChe?id=@item.BookID">*@
+                        <img src="~/images/goumaismall.jpg" bookid="@item.BookID" class="gwc" style="cursor:pointer" />
+                   @* </a>*@
+                </div>
+            </div>
+        }
+        </div>
+
+</div>
+<!--中部结束-->
+<script>
+    $(".gwc").click(function () {
+        var id = $(this).attr("bookid")
+        console.log(id)
+        $.ajax({
+            type: 'post',
+            url: '/UserBook/AddGWC',
+            data: { id: id },
+            success: function (d) {
+                if (d == 1) {
+                    layer.msg('成功加入购物车', {
+                        icon: 1,
+                        time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                    }, function () {
+                        //do something
+                    });
+                }
+            },
+            error: function (e) {
+
+            }
+        })
+    })
+</script>

@@ -1,0 +1,229 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>BookDel</title>
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <el-tabs type="border-card">
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-notebook-1"></i> 书籍回收站信息</span>
+                <div id="content">
+                    <div id="Sel">
+                        <el-form :inline="true" :model="from" class="demo-form-inline">
+                            <el-form-item label="书籍名称">
+                                <el-input v-model="from.booktitle" placeholder="书籍名称"></el-input>
+                            </el-form-item>
+                            <el-form-item label="所属大类别">
+                                <el-select v-model="from.blvalue" placeholder="请选择" v-on:change="getBSCategory()">
+                                    <el-option v-for="item in from.BLCategory"
+                                               :key="item.BLID"
+                                               :label="item.BLName"
+                                               :value="item.BLID">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="所属小类别">
+                                <el-select v-model="from.bsvalue" placeholder="请选择">
+                                    <el-option v-for="item in from.BSCategory"
+                                               :key="item.BSID"
+                                               :label="item.BSName"
+                                               :value="item.BSID">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="出版社">
+                                <el-input v-model="from.BookPublish" placeholder="出版社"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" v-on:click="onSubmit">查询</el-button>
+                            </el-form-item>
+                    </div>
+                    <div id="table">
+                        <el-table ref="multipleTable" :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%" :stripe="true" :border="true" size="small ">
+                            <el-table-column fixed prop="BookID" label="ID" width="50">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookTitle" label="书籍名" width="150">
+                            </el-table-column>
+                            <el-table-column fixed prop="BLName" label="大类别" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="BSName" label="小类别" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookPublish" label="出版社" width="120">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookPrice" label="标价" width="80">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookMoney" label="售价" width="80">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookSale" label="销售数量" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookDeport" label="库存数量" width="100">
+                            </el-table-column>
+                            <el-table-column label="操作">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" v-on:click="DelHSz(scope.row)">移出回收站</el-button>
+                                    <el-button size="mini" type="danger" v-on:click="Delete(scope.row)">彻底删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+
+                        <el-pagination v-on:size-change="handleSizeChange" v-on:current-change="handleCurrentChange" :current-page="currentPage"
+                                       :page-sizes="[4,6,8,10]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="tableData.length">
+                        </el-pagination>
+                    </div>
+                </div>
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+</body>
+</html>
+<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            //表格数据
+            tableData: [],
+            //分页
+            currentPage: 1,
+            pageSize: 6,
+            total: 20,
+
+            //搜索数据
+            from: {
+                booktitle: "",
+                BLCategory: [],
+                BSCategory: [],
+                BookPublish: "",
+                blvalue: "",
+                bsvalue: ""
+            },
+        },
+        created() {
+            this.getbooksAll()
+
+            this.getBLCategory()
+        },
+        methods: {
+            //格式化日期
+            //parseDate(value) {
+            //    try {
+            //        var date = new Date(parseInt(/\d+/.exec(value)[0]));
+            //        var year = parseInt(date.getFullYear(), 10);
+            //        if (year > 2500 || year < 1900) { return ""; }
+            //        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" +
+            //            date.getDate();
+            //    } catch (e) {
+            //        return "";
+            //    }
+            //},
+            //获取所以书籍
+            //获取所以大类别,绑定下拉菜单
+            getBLCategory() {
+                axios.get("/Category/GetBLCategoryAll", {}, {
+                    headers: {
+                    }
+                }).then(res => {
+                    console.log(res.data)
+                    this.from.BLCategory = res.data
+                })
+            },
+            //查询
+            onSubmit() {
+                console.log(this.from.blvalue)
+                console.log(this.from.bsvalue)
+
+                var obj = new Object();
+                obj.BookTitle = this.from.booktitle
+                obj.BookPublish = this.from.BookPublish
+                obj.BSID = this.from.bsvalue
+
+                axios.post("SelBookBuy", { bk: obj })
+                    .then(res => {
+                        this.tableData = res.data
+                    })
+
+            },
+            //彻底删除
+            Delete(row) {
+                console.log(row.BookID)
+                this.$confirm('书籍将被彻底删除，是否继续操作?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post("CDDel", { bookid: row.BookID })
+                        .then(res => {
+                            if (res.data > 0) {
+                                this.$message({
+                                    type: 'success',
+                                    message: '成功!'
+                                });
+                            }
+                            this.getbooksAll();
+                        })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消'
+                    });
+                });
+            },
+            //移除回收站
+            DelHSz(row) {
+                axios.post("DelHSz", { bookid: row.BookID })
+                    .then(res => {
+                        console.log(res.data)
+                        if (res.data > 0) {
+                            this.$message({
+                                message: '已成功移出回收站',
+                                type: 'success'
+                            });
+                        }
+                        this.getbooksAll()
+                    })
+            },
+            //根据大类别查询所有小类别
+            getBSCategory() {
+                var blid = this.from.blvalue
+                console.log(blid)
+                axios.post("/Category/GetBSCategoryByBLID", { blid: blid }, {
+                    headers: {
+                    }
+                }).then(res => {
+                    this.from.BSCategory = res.data
+                })
+            },
+            getbooksAll() {
+                axios.get("GetBookDel")
+                    .then(res => {
+                        console.log(res.data)
+                        //for (var i = 0; i < res.data.length; i++) {
+                        //    var date = this.parseDate(res.data[i].BookHotDate)
+                        //    res.data[i].BookHotDate = date;
+                        //}
+                        this.tableData = res.data
+                })
+            },
+            //分页 分页条数
+            handleSizeChange(val) {
+                this.pageSize = val
+            },
+            //当前页
+            handleCurrentChange(val) {
+                this.currentPage = val
+            },
+        }
+    })
+</script>

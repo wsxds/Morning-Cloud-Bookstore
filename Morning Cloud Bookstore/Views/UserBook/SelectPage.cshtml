@@ -1,0 +1,113 @@
+﻿@model List<Morning_Cloud_Bookstore.Models.Model.BooksModel>
+@{
+    ViewBag.Title = "SelectPage";
+    Layout = "~/Views/userBook.cshtml";
+}
+
+<!--中部开始-->
+
+<div id="mainDiv">
+    @foreach (var item in Model)
+    {
+        <table style="width:100%">
+            <tr>
+                <td rowspan="5" style="width:140px">
+                    <a href="/UserBook/BookPage?id=@item.BookID"><img src="@item.ImgUrl" /></a>
+                </td>
+                <td><a href="/UserBook/BookPage?id=@item.BookID">@item.BookTitle</a></td>
+            </tr>
+            <tr>
+                <td>作者：@item.BookAuthor</td>
+            </tr>
+            <tr>
+                <td>出版社：@item.BookPublish</td>
+            </tr>
+            <tr>
+                <td>
+                    已销售数量：@item.BookSale&nbsp;&nbsp;库存数量：@item.BookDeport&nbsp;&nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <font style="text-decoration: line-through">￥@item.BookPrice</font>&nbsp;&nbsp;
+                    <font color="#FF7126" style="font-weight:bold">￥@item.BookMoney</font>&nbsp;&nbsp;
+                    <a class="a" id="@item.BookID">
+                        <img src="~/images/goumaismall.jpg" style="cursor: pointer; margin-bottom: -6px;" />
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @item.BookDesc
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <hr style="width:100%" />
+                </td>
+            </tr>
+        </table>
+    }
+<div style="text-align:right">
+    @if (Session["page"] != null)
+    {
+        int page = (int)Session["page"];
+        int wy = (int)Session["Weiye"];
+        if (page != 1)
+        {
+
+            <a href="/UserBook/SelectPage?name=@Session["name"]&&page=1">首页</a>//&nbsp; &nbsp;
+        }
+
+        {
+
+            if (page > 1)
+            {
+                int syy = page - 1;
+
+                    <a href="/UserBook/SelectPage?name=@Session["name"]&&page=@syy">上一页</a>
+                }
+
+            }//&nbsp; &nbsp;
+            {
+
+                if (page < wy)
+                {
+                    int xyy = page + 1;
+
+                    <a href="/UserBook/SelectPage?name=@Session["name"]&&page=@xyy">下一页</a>//&nbsp; &nbsp;
+                }
+
+            }
+            if (page != wy)
+            {
+                <a href="/UserBook/SelectPage?name=@Session["name"]&&page=@wy">尾页</a>
+            }
+        }
+    </div>
+</div>
+<!--中部结束-->
+<script>
+    $(".a").click(function () {
+        var id = $(this).attr("id")
+        console.log(id);
+        $.ajax({
+            type: 'post',
+            url: '/UserBook/AddGWC',
+            data: { id: id },
+            success: function (d) {
+                if (d == 1) {
+                    layer.msg('成功加入购物车', {
+                        icon: 1,
+                        time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                    }, function () {
+                        //do something
+                    });
+                }
+            },
+            error: function (e) {
+
+            }
+        })
+    })
+</script>

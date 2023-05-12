@@ -1,0 +1,135 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>OrderDetail</title>
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <el-tabs type="border-card">
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-notebook-1"></i>订单详细信息</span>
+                <div id="content">
+                    <el-descriptions title="订单信息" :column="2" border>
+                        <el-descriptions-item label="订单编号">{{ OrderNum }}</el-descriptions-item>
+                        <el-descriptions-item label="订单时间">{{ OrderDate }}</el-descriptions-item>
+                        <el-descriptions-item label="订单总金额">{{ OrderMoney }}</el-descriptions-item>
+                        <el-descriptions-item label="订单状态">{{ OrderState }}</el-descriptions-item>
+                    </el-descriptions>
+                    <el-descriptions title="购物人信息" :column="2" border>
+                        <el-descriptions-item label="登录账号">{{ UserName }}</el-descriptions-item>
+                        <el-descriptions-item label="收货人">{{ UserNick }}</el-descriptions-item>
+                        <el-descriptions-item label="联系电话">{{ AMTel }}</el-descriptions-item>
+                        <el-descriptions-item label="收货地址">{{ AMAddress }}</el-descriptions-item>
+                    </el-descriptions>
+                    <h4>订单详细信息</h4>
+                    <el-table :data="tableData" style="width: 100%" :stripe="true" :border="true" size="small ">
+                        <el-table-column fixed prop="BookTitle" label="书籍名" width="150">
+                        </el-table-column>
+                        <el-table-column fixed prop="ODPrice" label="单价" width="150">
+                        </el-table-column>
+                        <el-table-column fixed prop="ODCount" label="数量" width="150">
+                        </el-table-column>
+                        <el-table-column fixed prop="ODMoney" label="总金额" width="150">
+                        </el-table-column>
+                    </el-table>
+                    <hr />
+                    <el-button type="primary" v-on:click="GetOrder">返回订单列表</el-button>
+                </div>
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+</body>
+</html>
+<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            //订单信息
+            OrderNum: "",
+            OrderDate: "",
+            OrderMoney: "",
+            OrderState: "",
+            //购物人信息
+            UserName: "",
+            UserNick: "",
+            AMTel: "",
+            AMAddress: "",
+
+            tableData:[]
+        },
+        created() {
+            this.getUserOrder()
+            this.getOrderDetail()
+        },
+        methods: {
+            //格式化日期
+            parseDate(value) {
+                try {
+                    var date = new Date(parseInt(/\d+/.exec(value)[0]));
+                    var year = parseInt(date.getFullYear(), 10);
+                    if (year > 2500 || year < 1900) { return ""; }
+                    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" +
+                        date.getDate();
+                } catch (e) {
+                    return "";
+                }
+            },
+            //获取信息
+            getUserOrder() {
+                axios.post("GetUserOrder", { oid:@Session["oid"]})
+                    .then(res => {
+                        console.log(res.data)
+                            switch (res.data.OrderState) {
+                                case 1:
+                                    res.data.OrderState = "待确认";
+                                    break;
+                                case 2:
+                                    res.data.OrderState = "已确认";
+                                    break;
+                                case 3:
+                                    res.data.OrderState = "已发货";
+                                    break;
+                                case 4:
+                                    res.data.OrderState = "完成";
+                                    break;
+                            }
+                            var date = this.parseDate(res.data.OrderDate);
+                            res.data.OrderDate = date;
+                            //订单信息
+                            this.OrderNum = res.data.OrderNum;
+                            this.OrderDate = res.data.OrderDate;
+                            this.OrderMoney = res.data.OrderMoney;
+                            this.OrderState = res.data.OrderState;
+                            //购物人信息
+                            this.UserName = res.data.UserName;
+                            this.UserNick = res.data.UserNick;
+                            this.AMTel = res.data.AMTel;
+                            this.AMAddress = res.data.AMAddress;
+                    })
+            },
+            //订单详细信息
+            getOrderDetail() {
+                axios.post("GetOrderDetail", { oid:@Session["oid"]})
+                    .then(res => {
+                        console.log(res.data)
+                        this.tableData = res.data
+                    })
+            },
+            GetOrder() {
+                location.href = "/Billing/Orders" 
+            }
+        }
+    })
+</script>

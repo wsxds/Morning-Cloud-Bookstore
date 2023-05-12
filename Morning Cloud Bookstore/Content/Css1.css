@@ -1,0 +1,87 @@
+﻿body 
+{
+	font-size:12px; 
+	font-family:"宋体",Verdana, Arial;
+	color:#666666;
+}
+#allDiv
+{
+	width:960px;
+	margin:0px auto;	
+}
+#headDiv
+{
+	
+}
+#leftDiv
+{
+	float:left;
+	width:200px;
+}
+#mainDiv
+{
+	float:right;
+	width:740px;
+    margin-left:10px;
+}
+#mainDiv a{color:black; text-decoration:none; padding-right:10px;}
+#mainDiv a:hover{color:#ff6600; text-decoration:none;}
+#footDiv
+{
+	clear:both;
+}
+a{color:#666; text-decoration:none; padding-right:10px;}
+a:hover{color:#ff6600; text-decoration:none;}
+#menuTable a
+{
+	color:White; text-decoration:none; font-weight:bold;
+}
+.redAll
+{
+	border:1px solid #BC1010;	
+}
+.redTitle
+{
+	height:28px;line-height:28px;padding:0px 8px;
+	color:White;font-size:14px;font-weight:bold;
+	background-color:#BC1010;
+}
+.yellowAll
+{
+	border:1px solid #FF6F31;	
+}
+.yellowTitle
+{
+	height:28px;line-height:28px;padding:0px 8px;
+	color:White;font-size:14px;font-weight:bold;
+	background-color:#FF6F31;
+}
+.block{
+  width:960px; height:auto;
+}
+.box{ overflow:hidden;}
+/*帮助*/
+   .helpTitBg{ background:url(images/help_bg.gif) repeat-x; text-align:left; border-bottom:1px solid #ccc; border-top:1px solid #ccc; padding:20px 0; width:100%; float:left
+   }
+   .helpTitBg dl{float:left; width:190px; padding-left:35px; padding:7px 0}
+   .helpTitBg dt{height:33px; line-height:33px; text-align:left;
+   font-weight:bold; color:#333; padding-left:30px; margin-bottom:0px;}
+   
+
+   
+     .helpTitBg dt a{font-weight:bold; color:#333; text-decoration:none;}
+	 .helpTitBg dd{ }
+   .helpTitBg dd a{color:#333; text-decoration:none; background:url(images/biao5.gif) no-repeat 0 center; padding:0px 0px 0px 10px;
+}
+.dataTable
+{
+	border:1px solid #DDDDDD;
+	border-collapse:collapse;	
+}
+.dataTable tr
+{
+	height:25px;line-height:25px;	
+}
+.dataTable td
+{border:1px solid #DDDDDD;padding:0 5px}
+

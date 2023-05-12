@@ -1,0 +1,119 @@
+﻿
+@{
+    ViewBag.Title = "Region";
+    Layout = "~/Views/userBook_1.cshtml";
+}
+
+<!--中部开始-->
+<div>
+    <div style="border:1px solid #CCCCCC;height:300px;padding:30px 100px">
+        <table>
+            <tr>
+                <td colspan="2">
+                    <img src="~/images/regisTitle.png" />
+                </td>
+            </tr>
+            <tr style="height:30px">
+                <td style="text-align:right">用户名</td>
+                <td style="text-align:left;padding-left:10px">
+                    <input type="text" id="name" /><font color="red">(必填)</font>
+                </td>
+            </tr>
+            <tr style="height:30px">
+                <td style="text-align:right">email</td>
+                <td style="text-align:left;padding-left:10px">
+                    <input type="text" id="email" /><font color="red">(必填)</font>
+                </td>
+            </tr>
+            <tr style="height:30px">
+                <td style="text-align:right">密码</td>
+                <td style="text-align:left;padding-left:10px">
+                    <input type="password" id="pwd" /><font color="red">(必填)</font>
+                </td>
+            </tr>
+            <tr style="height:30px">
+                <td style="text-align:right">密码确认</td>
+                <td style="text-align:left;padding-left:10px">
+                    <input type="password" id="okpwd" /><font color="red">(必填)</font>
+                </td>
+            </tr>
+            <tr style="height:30px">
+                <td style="text-align:right">性别</td>
+                <td style="text-align:left;padding-left:10px">
+                    <label><input type="radio"  name="sex" value="男" />男</label>
+                    <label><input type="radio"  name="sex"  value="女"/>女</label>
+                    <font color="red">(必填)</font>
+                </td>
+            </tr>
+            <tr style="height:30px">
+                <td style="text-align:right">昵称</td>
+                <td style="text-align:left;padding-left:10px">
+                    <input type="text" id="NickName" /><font color="red">(必填)</font>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right"></td>
+                <td style="text-align:left;padding-left:10px">
+                    <input type="image" id="tijao" src="~/images/regisBtn.png" style="border-width:0px;" />
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+<!--中部结束-->
+<script>
+    $("#tijao").click(function () {
+        var obj = new Object();
+        obj.UserName = $("#name").val()
+        obj.UserEmail = $("#email").val()
+        obj.UserPwd = $("#pwd").val()
+        var okpwd = $("#okpwd").val()
+        obj.UserSex = $("input[name='sex']:checked").val()
+        obj.UserNick = $("#NickName").val()
+        console.log(obj.UserSex)
+        if (obj.UserName == '' || obj.UserEmail == '' || obj.UserPwd == '' || okpwd == '' || obj.UserSex == '' || obj.UserNick == '') {
+            layer.msg('不能为空', {
+                icon: 2,
+                time: 2000 //2秒关闭（如果不配置，默认是3秒）
+            }, function () {
+                //do something
+            });
+        } else {
+            if (obj.pwd != obj.okpwd) {
+                layer.msg('两次密码不一致', {
+                    icon: 2,
+                    time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                }, function () {
+                    //do something
+                });
+            } else {
+                $.ajax({
+                    type: "post",
+                    url: "/UserBook/AddUser",
+                    data: { user: obj },
+                    success: function (d) {
+                        //
+                        if (d == -1) {
+                            layer.msg('用户名已存在', {
+                                icon: 2,
+                                time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                            }, function () {
+                                //do something
+                            });
+                        } else {
+                            location.href = "/UserBook/Login";
+                        }
+
+                    },
+                    error: function (e) {
+                        //
+                    }
+                })
+            }
+        }
+        
+        
+        
+    })
+</script>

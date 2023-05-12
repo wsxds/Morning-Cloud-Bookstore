@@ -1,0 +1,357 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Book</title>
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <el-tabs type="border-card">
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-notebook-1"></i> 书籍信息</span>
+                <div id="content">
+                    <div id="Sel">
+                        <el-form :inline="true" :model="from" class="demo-form-inline">
+                            <el-form-item label="书籍名称">
+                                <el-input v-model="from.booktitle" placeholder="书籍名称"></el-input>
+                            </el-form-item>
+                            <el-form-item label="所属大类别">
+                                <el-select v-model="from.blvalue" placeholder="请选择" v-on:change="getBSCategory()">
+                                    <el-option v-for="item in from.BLCategory"
+                                               :key="item.BLID"
+                                               :label="item.BLName"
+                                               :value="item.BLID">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="所属小类别">
+                                <el-select v-model="from.bsvalue" placeholder="请选择">
+                                    <el-option v-for="item in from.BSCategory"
+                                               :key="item.BSID"
+                                               :label="item.BSName"
+                                               :value="item.BSID">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item label="出版社">
+                                <el-input v-model="from.BookPublish" placeholder="出版社"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" v-on:click="onSubmit">查询</el-button>
+                            </el-form-item>
+                            <el-button type="primary" v-on:click="ShowAddBookPage">新增书籍</el-button>
+                            <el-button type="danger" round v-on:click="Buy">设为秒杀书籍</el-button>
+                            <el-button type="warning" round v-on:click="Hot">设为热门书籍</el-button>
+                        </el-form>
+                    </div>
+                    <div id="table">
+                        <el-table ref="multipleTable" :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)" v-on:selection-change="handleSelectionChange" style="width: 100%" :stripe="true" :border="true" size="small ">
+                            <el-table-column type="selection" width="55"></el-table-column>
+                            <el-table-column fixed prop="BookID" label="ID" width="50">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookTitle" label="书籍名" width="150">
+                            </el-table-column>
+                            <el-table-column fixed prop="BLName" label="大类别" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="BSName" label="小类别" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookPublish" label="出版社" width="120">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookPrice" label="标价" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookMoney" label="售价" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookSale" label="销售数量" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="BookDeport" label="库存数量" width="100">
+                            </el-table-column>
+                            <el-table-column label="操作">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" v-on:click="Edit(scope.row)">编辑</el-button>
+                                    <el-button size="mini" type="danger" v-on:click="Delete(scope.row)">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+
+                        <el-pagination v-on:size-change="handleSizeChange" v-on:current-change="handleCurrentChange" :current-page="currentPage"
+                                       :page-sizes="[4,6,8,10]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="tableData.length">
+                        </el-pagination>
+                    </div>
+                </div>
+            </el-tab-pane>
+        </el-tabs>
+
+        <el-dialog title="编辑书籍信息" :visible.sync="dialogFormVisible">
+            <el-form :model="Editform">
+                <el-form-item label="书籍名称" :label-width="formLabelWidth">
+                    <el-input v-model="Editform.BookTitle" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="所属小类别" :label-width="formLabelWidth">
+                    <el-select v-model="Editform.value" placeholder="请选择">
+                        <el-option v-for="item in Editform.BSCategory"
+                                   :key="item.BSID"
+                                   :label="item.BSName"
+                                   :value="item.BSID">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="出版社" :label-width="formLabelWidth">
+                    <el-input v-model="Editform.BookPublish" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-row>
+                    <el-col :span="11">
+                        <el-form-item label="标价" :label-width="formLabelWidth">
+                            <el-input v-model="Editform.BookPrice" autocomplete="off"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="11">
+                        <el-form-item label="售价" :label-width="formLabelWidth">
+                            <el-input v-model="Editform.BookMoney" autocomplete="off"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+
+                <el-row>
+                    <el-col :span="11">
+                        <el-form-item label="销售数量" :label-width="formLabelWidth">
+                            <el-input v-model="Editform.BookSale" autocomplete="off"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="11">
+                        <el-form-item label="库存数量" :label-width="formLabelWidth">
+                            <el-input v-model="Editform.BookDeport" autocomplete="off"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                
+                
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button v-on:click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" v-on:click="SaveEdit">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+</body>
+</html>
+<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            //表格数据
+            tableData: [],
+            //分页
+            currentPage: 1,
+            pageSize: 6,
+            total: 20,
+
+            from: {
+                booktitle: "",
+                BLCategory: [],
+                BSCategory: [],
+                BookPublish: "",
+                blvalue: "",
+                bsvalue: ""
+            },
+
+            multipleSelection: [],
+
+
+            Editform: {
+                BookID:"",
+                BookTitle: '',
+                value: '',
+                BSCategory: [],
+                BookPublish: '',
+                BookMoney:'',
+                BookPrice: '',
+                BookSale: '',
+                BookDeport: ''
+            },
+            dialogFormVisible: false,
+            formLabelWidth:'120px'
+        },
+        created() {
+            this.getbooksAll()
+            this.getBLCategory()
+            this.getBSCategoryAll()
+        },
+        methods: {
+            //保存修改的数据
+            SaveEdit() {
+                var book = new Object();
+                book.BookID = this.Editform.BookID
+                book.BookTitle = this.Editform.BookTitle
+                book.BSID = this.Editform.value
+                book.BookPublish = this.Editform.BookPublish
+                book.BookPrice = this.Editform.BookPrice
+                book.BookMoney = this.Editform.BookMoney
+                book.BookSale = this.Editform.BookSale
+                book.BookDeport = this.Editform.BookDeport
+
+                axios.post("EditBook", { book: book })
+                    .then(res => {
+                        if (res.data > 0) {
+                            this.$message({
+                                type: 'success',
+                                message: '修改成功!'
+                            });
+                            this.dialogFormVisible = false
+                        }
+                        this.getbooksAll();
+                })
+            },
+            //展示数据
+            Edit(row) {
+                console.log(row)
+                this.dialogFormVisible = true
+                this.Editform.BookID = row.BookID
+                this.Editform.BookTitle = row.BookTitle
+                this.Editform.value = row.BSID
+                this.Editform.BookPublish = row.BookPublish
+                this.Editform.BookPrice = row.BookPrice
+                this.Editform.BookMoney = row.BookMoney
+                this.Editform.BookSale = row.BookSale
+                this.Editform.BookDeport = row.BookDeport
+                
+            },
+            ShowAddBookPage() {
+                location.href ="/Basic/AddBookPage"
+            },
+            Delete(row) {
+                console.log(row.BookID)
+                this.$confirm('此操作将把书籍移入回收站，是否继续操作?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post("AddDel", { bookid: row.BookID })
+                        .then(res => {
+                            if (res.data>0) {
+                                this.$message({
+                                    type: 'success',
+                                    message: '成功!'
+                                });
+                            }
+                            this.getbooksAll();
+                        })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消'
+                    });
+                });
+            },
+            //设为热门
+            Hot() {
+                var list = []
+                for (var i = 0; i < this.multipleSelection.length; i++) {
+                    list.push(this.multipleSelection[i].BookID)
+                }
+                axios.post("AddHot", { arr: list })
+                    .then(res => {
+                        console.log(res.data)
+                        if (res.data > 0) {
+                            this.$message({
+                                message: '已成功设为热门状态',
+                                type: 'success'
+                            });
+                        }
+                        this.getbooksAll()
+                    })
+            },
+            //设为秒杀
+            Buy() {
+                var list = []
+                for (var i = 0; i < this.multipleSelection.length; i++) {
+                    list.push(this.multipleSelection[i].BookID)
+                }
+                axios.post("AddBuy", { arr: list })
+                    .then(res => {
+                        console.log(res.data)
+                        if (res.data > 0) {
+                            this.$message({
+                                message: '已成功设为秒杀状态',
+                                type: 'success'
+                            });
+                        }
+                        this.getbooksAll()
+                })
+            },
+            //获取所以大类别,绑定下拉菜单
+            getBLCategory() {
+                axios.get("/Category/GetBLCategoryAll", {}, {
+                    headers: {
+                    }
+                }).then(res => {
+                    console.log(res.data)
+                    this.from.BLCategory = res.data
+                })
+            },
+            //根据大类别查询所有小类别
+            getBSCategory() {
+                var blid = this.from.blvalue
+                console.log(blid)
+                axios.post("/Category/GetBSCategoryByBLID", { blid: blid }, {
+                    headers: {
+                    }
+                }).then(res => {
+                    this.from.BSCategory = res.data
+                })
+            },
+            //获取所以小类别
+            getBSCategoryAll() {
+                axios.post("/Category/GetBSCategoryAll", {
+                    headers: {
+                    }
+                }).then(res => {
+                    this.Editform.BSCategory = res.data
+                })
+            },
+            //获取所以书籍
+            getbooksAll() {
+                axios.get("GetBooks")
+                    .then(res => {
+                        this.tableData = res.data
+                    })
+            },
+            onSubmit() {
+                console.log(this.from.blvalue)
+                console.log(this.from.bsvalue)
+
+                var obj = new Object();
+                obj.BookTitle = this.from.booktitle
+                obj.BookPublish = this.from.BookPublish
+                obj.BSID = this.from.bsvalue
+
+                axios.post("SelBook", { bk: obj })
+                    .then(res => {
+                        this.tableData = res.data
+                })
+
+            },
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            //分页 分页条数
+            handleSizeChange(val) {
+                this.pageSize = val
+            },
+            //当前页
+            handleCurrentChange(val) {
+                this.currentPage = val
+            },
+        }
+    })
+</script>

@@ -1,0 +1,341 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .el-header {
+            background: url('../../Images/top.png');
+        }
+
+        .el-menu {
+            height: 100%
+        }
+
+        a {
+            text-decoration: none;
+            color: white
+        }
+
+        .logo {
+            float: left;
+            line-height: 60px;
+            color: #fff;
+        }
+
+        .user {
+            float: right;
+            line-height: 60px;
+            color: #fff;
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $(".el-menu-item").click(function () {
+                var url = $(this).attr("url");
+                $("#page").attr("src", url + "?" + Math.random());
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="app">
+        <el-container>
+            <el-header>
+                <div class="logo">
+                    <h1>晨云书城 后台管理系统</h1>
+                </div>
+                <div class="user">
+                    <label>@Model</label>
+                    <label><a href="/Login/Index">退出</a></label>
+                </div>
+            </el-header>
+
+            <el-container>
+                <el-aside width="250px">
+                    <el-menu default-active="5" class="el-menu-vertical-demo" background-color="#fff" text-color="#000" active-text-color="#000">
+                        <el-menu-item-group>
+                            <el-menu-item index="6-1" url="/Category/Index">首页</el-menu-item>
+                        </el-menu-item-group>
+                        <el-submenu index="5">
+                            <template slot="title">
+                                <i class="el-icon-location"></i>
+                                <span>个人中心</span>
+                            </template>
+                            <el-menu-item-group>
+                                <el-menu-item index="5-1" url="/Admins/GrZx">个人中心</el-menu-item>
+                            </el-menu-item-group>
+                        </el-submenu>
+                        <el-submenu index="1">
+                            <template slot="title">
+                                <i class="el-icon-location"></i>
+                                <span>书籍类别管理</span>
+                            </template>
+                            <el-menu-item-group>
+                                <el-menu-item index="1-1" url="/Category/BLIndex">书籍大类别管理</el-menu-item>
+                                <el-menu-item index="1-2" url="/Category/BSIndex">书籍小类别管理</el-menu-item>
+                            </el-menu-item-group>
+                        </el-submenu>
+                        <el-submenu index="2">
+                            <template slot="title">
+                                <i class="el-icon-location"></i>
+                                <span>基本信息管理</span>
+                            </template>
+                            <el-menu-item-group>
+                                <el-menu-item index="2-1" url="/Basic/Book">基本书籍管理</el-menu-item>
+                                <el-menu-item index="2-2" url="/Basic/BookHot">热门书籍管理</el-menu-item>
+                                <el-menu-item index="2-3" url="/Basic/BookBuy">秒杀书籍管理</el-menu-item>
+                                <el-menu-item index="2-4" url="/Basic/BookDel">书籍回收站管理</el-menu-item>
+                            </el-menu-item-group>
+                        </el-submenu>
+                        <el-submenu index="3">
+                            <template slot="title">
+                                <i class="el-icon-location"></i>
+                                <span>单据管理</span>
+                            </template>
+                            <el-menu-item-group>
+                                <el-menu-item index="3-1" url="/Billing/Orders">订单管理</el-menu-item>
+                                <el-menu-item index="3-4" url="/Billing/OrderDetailView">订单详细信息</el-menu-item>
+                            </el-menu-item-group>
+                        </el-submenu>
+                        @*<el-submenu index="4">
+                                <template slot="title">
+                                    <i class="el-icon-setting"></i>
+                                    <span slot="title">报表管理</span>
+                                </template>
+                                <el-menu-item-group>
+                                    <el-menu-item index="4-1" v-on:click="addTab(editableTabsValue)"><label class="id" url="/Category/BSIndex" title="类别分类报表">类别分类报表</label></el-menu-item>
+                                </el-menu-item-group>
+                                <el-menu-item-group>
+                                    <el-menu-item index="4-2" v-on:click="addTab(editableTabsValue)"><label class="id" url="/Category/BSIndex" title="年度收入报表">年度收入报表</label></el-menu-item>
+                                </el-menu-item-group>
+
+                            </el-submenu>*@
+
+                        <el-submenu index="4">
+                            <template slot="title">
+                                <i class="el-icon-setting"></i>
+                                <span slot="title">系统管理</span>
+                            </template>
+                            <el-menu-item-group>
+                                <el-menu-item index="4-1" url="/Admins/Index">管理员信息管理</el-menu-item>
+                            </el-menu-item-group>
+                            <el-menu-item-group>
+                                <el-menu-item index="4-2" url="/User/Index">用户信息管理</el-menu-item>
+                            </el-menu-item-group>
+
+                        </el-submenu>
+                    </el-menu>
+                </el-aside>
+                <el-main>
+                    <div class="right" id="mainFrame">
+                        <iframe id="page" name="page" scrolling="auto" frameborder="0" src="/Category/Index" style="width:1240px;height:100vh"></iframe>
+                    </div>
+                    @*<el-tabs v-model="editableTabsValue" type="card" closable v-on:tab-remove="removeTab">
+                            <el-tab-pane v-for="(item, index) in editableTabs" :key="item.name" :label="item.title" :name="item.name">
+                                <iframe :src="item.content" style="width:100%;height:800px;border:none;"></iframe>
+                            </el-tab-pane>
+                        </el-tabs>*@
+                </el-main>
+            </el-container>
+        </el-container>
+    </div>
+</body>
+</html>
+<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            //editableTabsValue: '1',
+            //editableTabs: [{
+            //    title: '首页',
+            //    name: '1',
+            //    content: '/Category/Index'
+            //}],
+            //tabIndex: 1,
+        },
+        methods: {
+            //addTabBLIndex(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".BLIndex").attr("title")
+            //    let url = $(".BLIndex").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabBSIndex(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".BSIndex").attr("title")
+            //    let url = $(".BSIndex").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabBook(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".Book").attr("title")
+            //    let url = $(".Book").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabBookHot(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".BookHot").attr("title")
+            //    let url = $(".BookHot").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabBookBuy(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".BookBuy").attr("title")
+            //    let url = $(".BookBuy").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabBookDel(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".BookDel").attr("title")
+            //    let url = $(".BookDel").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabOrders(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".Orders").attr("title")
+            //    let url = $(".Orders").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabOrderDetailView(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".OrderDetailView").attr("title")
+            //    let url = $(".OrderDetailView").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabAdmin(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".Admins").attr("title")
+            //    let url = $(".Admins").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabUser(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".User").attr("title")
+            //    let url = $(".User").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabBLIndex(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".BLIndex").attr("title")
+            //    let url = $(".BLIndex").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //addTabBLIndex(targetName) {
+            //    let newTabName = ++this.tabIndex + '';
+            //    let title = $(".BLIndex").attr("title")
+            //    let url = $(".BLIndex").attr("url")
+            //    this.editableTabs.push({
+            //        title: title,
+            //        name: newTabName,
+            //        content: url
+            //    });
+            //    this.editableTabsValue = newTabName;
+
+            //},
+            //removeTab(targetName) {
+            //    let tabs = this.editableTabs;
+            //    let activeName = this.editableTabsValue;
+            //    if (activeName === targetName) {
+            //        tabs.forEach((tab, index) => {
+            //            if (tab.name === targetName) {
+            //                let nextTab = tabs[index + 1] || tabs[index - 1];
+            //                if (nextTab) {
+            //                    activeName = nextTab.name;
+            //                }
+            //            }
+            //        });
+            //    }
+
+            //    this.editableTabsValue = activeName;
+            //    this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+            //},
+
+
+        }
+    })
+
+
+</script>

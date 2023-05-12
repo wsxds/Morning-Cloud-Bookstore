@@ -1,0 +1,124 @@
+﻿
+@{
+    ViewBag.Title = "BalancePage";
+    Layout = "~/Views/userBook_1.cshtml";
+}
+
+<!--中部开始-->
+<div>
+    <p></p>
+    <div style="background-color:#F6F6F6;color:Black;font-weight:bold;font-size:14px;height:30px;line-height:30px;padding:3px 10px">收货人信息</div>
+    <p></p>
+    <table class="dataTable" style="width:98%">
+        @if (Session["address"] != null)
+        {
+            Morning_Cloud_Bookstore.Models.AddressManager address = Session["address"] as Morning_Cloud_Bookstore.Models.AddressManager;
+            <tr>
+                <td style="text-align:right;height:30px;line-height:30px;padding:0px 8px;width:150px">收货人姓名(必填)：</td>
+                <td style="text-align:left;height:30px;line-height:30px;padding:0px 8px">
+                    <label>@address.AMUser</label>
+                </td>
+                <td style="text-align:right;height:30px;line-height:30px;padding:0px 8px;width:150px">联系电话(必填)：</td>
+                <td style="text-align:left;height:30px;line-height:30px;padding:0px 8px">
+                    <label>@address.AMTel</label>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;height:30px;line-height:30px;padding:0px 8px;width:150px">收货地址(必填)：</td>
+                <td colspan="3" style="text-align:left;height:30px;line-height:30px;padding:0px 8px">
+                    <label>@address.AMAddress</label>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td style="text-align:right;height:30px;line-height:30px;padding:0px 8px;width:150px">收货人姓名(必填)：</td>
+                <td style="text-align:left;height:30px;line-height:30px;padding:0px 8px">
+                    <label></label>
+                </td>
+                <td style="text-align:right;height:30px;line-height:30px;padding:0px 8px;width:150px">联系电话(必填)：</td>
+                <td style="text-align:left;height:30px;line-height:30px;padding:0px 8px">
+                    <label></label>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;height:30px;line-height:30px;padding:0px 8px;width:150px">收货地址(必填)：</td>
+                <td colspan="3" style="text-align:left;height:30px;line-height:30px;padding:0px 8px">
+                    <label></label>
+                </td>
+            </tr>
+        }
+
+        <tr>
+            <td style="text-align:right;height:30px;line-height:30px;padding:0px 8px">&nbsp;</td>
+            <td colspan="3" style="text-align:left;height:30px;line-height:30px;padding:0px 8px">
+                <input type="button" value="地址管理" onclick="javascript: window.location.href = '/UserBook/AddressPage'" />
+            </td>
+        </tr>
+    </table>
+    <p></p>
+    <div style="background-color:#F6F6F6;color:Black;font-weight:bold;font-size:14px;height:30px;line-height:30px;padding:3px 10px">付款方式</div>
+    <p></p>
+    <div><input type="radio" name="money" checked="checked" />支付宝&nbsp;&nbsp;<input type="radio" name="money" />网银&nbsp;&nbsp;<input type="radio" name="money" />微信</div>
+    <p></p>
+    <div style="background-color:#F6F6F6;color:Black;font-weight:bold;font-size:14px;height:30px;line-height:30px;padding:3px 10px">购物清单</div>
+    <p></p>
+    <table class="dataTable" cellspacing="0" border="1" style="width:98%;border-collapse:collapse">
+        <tr>
+            <th align="center" scope="col" style="height:30px;">商品名称</th>
+            <th align="center" scope="col">售价</th>
+            <th align="center" scope="col">折扣价</th>
+            <th align="center" scope="col">购买数量</th>
+            <th align="center" scope="col">小计</th>
+        </tr>
+        @if (Session["list"] != null)
+        {
+            foreach (var item in Session["list"] as List<Morning_Cloud_Bookstore.Models.Model.BooksModel>)
+            {
+                <tr>
+                    <td align="center" style="height:30px;">
+                        <a href="BooksPage" target="_blank">@item.BookTitle</a>
+                    </td>
+                    <td align="center" style="height:30px;">
+                        @item.BookPrice
+                    </td>
+                    <td align="center">
+                        @item.BookMoney
+                    </td>
+                    <td align="center">
+                        @item.Count
+                    </td>
+                    <td align="center">
+                        @item.BookMoney
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <th align="center" style="height:30px;" colspan="5">
+                    暂无数据
+                </th>
+            </tr>
+        }
+
+
+    </table>
+    <div style="text-align:right;padding-top:20px">
+        @if (Session["bookMoneyTotal"] != null)
+        {
+            <font color="#FF7126" style="font-weight:bold;font-size:20px">￥@Session["bookMoneyTotal"]元</font>
+            <input type="button" value="提交订单" onclick="javascript: window.location.href = '/UserBook/DisplayPage'" />
+        }
+        else
+        {
+            <font color="#FF7126" style="font-weight:bold;font-size:20px">￥0元</font>
+
+            <input type="button" value="提交订单" onclick="javascript: window.location.href = '/UserBook/DisplayPage'" disabled="disabled" />
+        }
+        &nbsp; &nbsp;
+    </div>
+</div>
+<!--中部结束-->

@@ -1,0 +1,130 @@
+﻿@model Morning_Cloud_Bookstore.Models.Model.BooksModel
+@{
+    ViewBag.Title = "BookPage";
+    Layout = "~/Views/userBook.cshtml";
+}
+
+<!--中部开始-->
+<div id="mainDiv">
+    <div style="padding:10px">
+        <a href="#">全部</a>>> <a href="#">.NET</a>>> <a href="#">C#</a> >> C#高级编程
+    </div>
+    <div style="border: 1px solid #DEDFDE;padding:20px;width:700px">
+        <table style="width:100%">
+            <tr>
+                <td rowspan="6" style="width:140px">
+                    <img src="@Model.ImgUrl" />
+                </td>
+                <td>@Model.BookTitle</td>
+            </tr>
+            <tr>
+                <td>作者：@Model.BookAuthor</td>
+            </tr>
+            <tr>
+                <td>出版社：@Model.BookPublish</td>
+            </tr>
+            <tr>
+                <td>ISBN：@Model.ISBN&nbsp;&nbsp;书籍字数：@Model.BookCount</td>
+            </tr>
+            <tr>
+                <td>
+                    已销售数量：@Model.BookSale&nbsp;&nbsp;库存数量：@Model.BookDeport
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <font style="text-decoration: line-through">￥@Model.BookPrice</font>&nbsp;&nbsp;
+                    <font color="#FF7126" style="font-weight:bold">￥@Model.BookMoney</font>&nbsp;&nbsp;
+                    <a class="a" id="@Model.BookID">
+                        <img src="~/images/goumaismall.jpg" style="cursor: pointer; margin-bottom: -6px;" />
+                    </a>
+                </td>
+            </tr>
+        </table>
+        <p></p>
+        <strong>编辑推荐</strong>
+        <hr style="width:100%" />
+        @Model.BookComm
+        <p></p>
+        <strong>内容简介</strong>
+        <hr style="width:100%" />
+        @Model.BookDesc
+        <p></p>
+        <strong>作者介绍</strong>
+        <hr style="width:100%" />
+        @Model.BookAuthorDesc
+        <p></p>
+        <strong>目录摘要</strong>
+        <hr style="width:100%" />
+        @Model.BookContent
+        <p></p>
+        <strong>书籍评价</strong>
+        <hr style="width:100%" />
+        <table style="width:98%">
+            <tr>
+                <td style="width:200px;vertical-align:top;padding:10px">
+                    <p>会员：张三</p>
+                    <p>2016-1-1 12:12</p>
+                    <p>5分</p>
+                </td>
+                <td style="vertical-align: top; padding: 10px">
+                    非常厚的一本书，书里面的内容讲的很详细，可以拿过来反复看几遍～
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><hr style="width:100%" /></td>
+            </tr>
+            <tr>
+                <td style="width:200px;vertical-align:top;padding:10px">
+                    <p>会员：张三</p>
+                    <p>2016-1-1 12:12</p>
+                    <p>5分</p>
+                </td>
+                <td style="vertical-align: top; padding: 10px">
+                    活动价格入手的，优惠幅度够够的，书的质量不错，应该是正版，物流速度够快
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><hr style="width:100%" /></td>
+            </tr>
+            <tr>
+                <td style="width:200px;vertical-align:top;padding:10px">
+                    <p>会员：张三</p>
+                    <p>2016-1-1 12:12</p>
+                    <p>5分</p>
+                </td>
+                <td style="vertical-align: top; padding: 10px">
+                    一本工具书，非常全面，但如果作为入门不合适，因为他只有操作方法缺乏例子无法深刻理解.非常厚有木有？
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><hr style="width:100%" /></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<!--中部结束-->
+<script>
+    $(".a").click(function () {
+        var id = $(this).attr("id")
+        console.log(id);
+        $.ajax({
+            type: 'post',
+            url: '/UserBook/AddGWC',
+            data: { id: id },
+            success: function (d) {
+                if (d == 1) {
+                    layer.msg('成功加入购物车', {
+                        icon: 1,
+                        time: 2000 //2秒关闭（如果不配置，默认是3秒）
+                    }, function () {
+                        //do something
+                    });
+                }
+            },
+            error: function (e) {
+
+            }
+        })
+    })
+</script>

@@ -1,0 +1,144 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    @*<link href="~/Content/bootstrap-4.6.2-dist/css/bootstrap.css" rel="stylesheet" />*@
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+    <style type="text/css">
+        body {
+            background: #0066A8 url(../images/login_bg.png) no-repeat center 0px;
+        }
+
+        .tit {
+            margin: auto;
+            margin-top: 170px;
+            text-align: center;
+            width: 350px;
+            padding-bottom: 20px;
+        }
+
+        .login-wrap {
+            width: 220px;
+            padding: 30px 50px 0 330px;
+            height: 220px;
+            background: #fff url(../images/20150212154319.jpg) no-repeat 30px 42px;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        .login_input {
+            display: block;
+            width: 210px;
+        }
+
+        .login_user {
+            background: url(../images/input_icon_1.png) no-repeat 200px center;
+            font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+        }
+
+        .login_password {
+            background: url(../images/input_icon_2.png) no-repeat 200px center;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        .btn-login {
+            background: #40454B;
+            box-shadow: none;
+            text-shadow: none;
+            color: #fff;
+            border: none;
+            height: 35px;
+            width:210px;
+            line-height: 26px;
+            font-size: 14px;
+            font-family: "microsoft yahei";
+        }
+
+            .btn-login:hover {
+                background: #333;
+                color: #fff;
+            }
+
+        .copyright {
+            margin: auto;
+            margin-top: 10px;
+            text-align: center;
+            width: 370px;
+            color: #CCC;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="tit" style="color:white;font-size:28px;font-weight:bold;font-family:'Microsoft YaHei UI'">晨云网上书城管理系统</div>
+        <div class="login-wrap">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td height="23" valign="bottom">用户名：</td>
+                </tr>
+                <tr>
+                    <td><input type="text" v-model="username" class="login_input login_user" /></td>
+                </tr>
+                <tr>
+                    <td height="23" valign="bottom">密  码：</td>
+                </tr>
+                <tr>
+                    <td><input type="password" v-model="password" class="login_input login_password" /></td>
+                </tr>
+                <tr>
+                    <td height="40" valign="bottom"><button v-on:click="y_login" class="btn btn-block btn-login">登录</button></td>
+                </tr>
+
+            </table>
+        </div>
+        <div class="copyright">建议使用IE8以上版本或谷歌浏览器</div>
+    </div>
+
+</body>
+</html>
+
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            username: '',
+            password: ''
+
+        },
+        methods: {
+            y_login() {//点击登录按钮后发送ajax请求给后端进行账号密码比对
+                if (this.username == '') {
+                    this.$message.error('用户名不能为空');
+                } else if (this.password == '') {
+                    this.$message.error('密码不能为空');
+                } else {
+                    axios.post("/Login/Login", { name: this.username, pwd: this.password })
+                        .then(res => {
+                            if (res.data != -1) {
+                                console.log(res.data)
+                                location.href = "/Home/Index"
+                            } else {
+                                this.$message.error('用户名或密码错误');
+                                this.password = '';
+                            }
+                        })
+                }
+            }
+        }
+
+    });
+</script>

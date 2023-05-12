@@ -1,0 +1,211 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Orders</title>
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-4.6.2-dist/css/bootstrap.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <el-tabs type="border-card">
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-notebook-1"></i> 订单管理</span>
+                <div id="content">
+                    <div id="Sel">
+                        <el-form :inline="true" :model="from" class="demo-form-inline">
+                            <el-form-item label="订单编号">
+                                <el-input v-model="from.OrderNum" placeholder="订单编号"></el-input>
+                            </el-form-item>
+                            <el-form-item label="客户姓名">
+                                <el-input v-model="from.UserNick" placeholder="客户姓名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="订单状态">
+                                <el-select v-model="from.value" placeholder="请选择">
+                                    <el-option v-for="item in from.options"
+                                               :key="item.value"
+                                               :label="item.label"
+                                               :value="item.value">
+                                    </el-option>
+                                </el-select>
+                                <el-form-item>
+                                    <el-button type="primary" v-on:click="onSubmit">查询</el-button>
+                                </el-form-item>
+                    </div>
+                    <div id="table">
+                        <el-table ref="multipleTable" :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%" :stripe="true" :border="true" size="small ">
+                            <el-table-column fixed prop="OrderNum" label="订单编号" width="150">
+                            </el-table-column>
+                            <el-table-column fixed prop="UserNick" label="客户姓名" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="OrderDate" label="订单时间" width="120">
+                            </el-table-column>
+                            <el-table-column fixed prop="OrderMoney" label="总金额" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="OrderState" label="状态" width="120">
+                            </el-table-column>
+                            <el-table-column label="操作">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" v-on:click="GetOrderDetail(scope.row)">订单详细信息</el-button>
+                                    <el-button size="mini" type="primary" v-on:click="EditState(scope.row)" :disabled="look">下一状态</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+
+                        <el-pagination v-on:size-change="handleSizeChange" v-on:current-change="handleCurrentChange" :current-page="currentPage"
+                                       :page-sizes="[4,6,8,10]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="tableData.length">
+                        </el-pagination>
+                    </div>
+                </div>
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+</body>
+</html>
+<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            //表格数据
+            tableData: [],
+            //分页
+            currentPage: 1,
+            pageSize: 6,
+            total: 20,
+
+            look: false,
+
+            from: {
+                OrderNum: "",
+                UserNick: "",
+                options: [{
+                    value: 0,
+                    label: '全部'
+                }, {
+                    value: 1,
+                    label: '待确认'
+                }, {
+                    value: 2,
+                    label: '已确认'
+                }, {
+                    value: 3,
+                    label: '已发货'
+                }, {
+                    value: 4,
+                    label: '完成'
+                }],
+                value: '',
+            }
+
+
+        },
+        created() {
+            this.getOrdersAll()
+        },
+        methods: {
+            //格式化日期
+            parseDate(value) {
+                try {
+                    var date = new Date(parseInt(/\d+/.exec(value)[0]));
+                    var year = parseInt(date.getFullYear(), 10);
+                    if (year > 2500 || year < 1900) { return ""; }
+                    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" +
+                        date.getDate();
+                } catch (e) {
+                    return "";
+                }
+            },
+            //获取所以订单
+            getOrdersAll() {
+                axios.get("GetOrders")
+                    .then(res => {
+                        console.log(res.data)
+                        for (var i = 0; i < res.data.length; i++) {
+                            switch (res.data[i].OrderState) {
+                                case 1:
+                                    res.data[i].OrderState = "待确认";
+                                    break;
+                                case 2:
+                                    res.data[i].OrderState = "已确认";
+                                    break;
+                                case 3:
+                                    res.data[i].OrderState = "已发货";
+                                    break;
+                                case 4:
+                                    res.data[i].OrderState = "完成";
+                                    break;
+                            }
+                            var date = this.parseDate(res.data[i].OrderDate);
+                            res.data[i].OrderDate = date;
+                        }
+                        this.tableData = res.data
+                    })
+            },
+            EditState(row) {
+                console.log(row)
+                axios.post("EditState", { id: row.OrderID })
+                    .then(res => {
+                        if (res.data.count > 0) {
+                            this.getOrdersAll()
+                        }
+                        if (row.OrderState == "完成") {
+                            this.$message({
+                                message: '订单已经完成了哦',
+                                type: 'warning'
+                            });
+                        }
+                    })
+            },
+            GetOrderDetail(row) {
+                console.log(row.OrderID)
+                location.href = "/Billing/OrderDetail?oid=" + row.OrderID
+            },
+            onSubmit() {
+                var od = new Object();
+                od.OrderNum = this.from.OrderNum
+                od.OrderState = this.from.value
+                od.UserNick = this.from.UserNick
+                axios.post("SelOrder", { od: od })
+                    .then(res => {
+                        for (var i = 0; i < res.data.length; i++) {
+                            switch (res.data[i].OrderState) {
+                                case 1:
+                                    res.data[i].OrderState = "待确认";
+                                    break;
+                                case 2:
+                                    res.data[i].OrderState = "已确认";
+                                    break;
+                                case 3:
+                                    res.data[i].OrderState = "已发货";
+                                    break;
+                                case 4:
+                                    res.data[i].OrderState = "完成";
+                                    break;
+                            }
+                            var date = this.parseDate(res.data[i].OrderDate);
+                            res.data[i].OrderDate = date;
+                        }
+                        this.tableData = res.data;
+                    })
+            },
+            //分页 分页条数
+            handleSizeChange(val) {
+                this.pageSize = val
+            },
+            //当前页
+            handleCurrentChange(val) {
+                this.currentPage = val
+            },
+        }
+    })
+</script>

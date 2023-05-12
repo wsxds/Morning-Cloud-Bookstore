@@ -1,0 +1,261 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #content {
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+
+        #table {
+            margin-top: 20px
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div>
+            <el-tabs type="border-card">
+                <el-tab-pane>
+                    <span slot="label"><i class="el-icon-notebook-1"></i> 书籍小类别</span>
+
+                    <div id="content">
+                        <div id="Sel">
+                            <label>所属大类别</label>
+                            <el-select v-model="value" placeholder="请选择">
+                                <el-option v-for="item in BLCategory"
+                                           :key="item.BLID"
+                                           :label="item.BLName"
+                                           :value="item.BLID">
+                                </el-option>
+                            </el-select>
+                            <el-button type="primary" v-on:click="onSubmit">查询</el-button>
+                            <el-button type="primary" v-on:click="dialogAdd = true">新增小类别</el-button>
+                        </div>
+                        <div id="table">
+                            <el-table ref="multipleTable" :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)" style="width: 100%" :stripe="true" :border="true" size="small ">
+                                <el-table-column fixed prop="BSID" label="ID" width="150">
+                                </el-table-column>
+                                <el-table-column fixed prop="BSName" label="小类别名称" width="150">
+                                </el-table-column>
+                                <el-table-column fixed prop="BLName" label="所属大类别类别" width="150">
+                                </el-table-column>
+                                <el-table-column label="操作">
+                                    <template slot-scope="scope">
+                                        <el-button size="mini" v-on:click="Edit(scope.row)">编辑</el-button>
+                                        <el-button size="mini" type="danger" v-on:click="Delete(scope.row)">删除</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+
+                            <el-pagination v-on:size-change="handleSizeChange" v-on:current-change="handleCurrentChange" :current-page="currentPage"
+                                           :page-sizes="[4,6,8,10]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="tableData.length">
+                            </el-pagination>
+                        </div>
+
+
+
+                        <el-dialog title="编辑" :visible.sync="dialogEdit">
+                            <el-form :model="BSform">
+                                <el-form-item label="小类别名称" :label-width="formLabelWidth">
+                                    <el-input v-model="BSform.bsName" autocomplete="off"></el-input>
+                                </el-form-item>
+                                <el-form-item label="所属大类别" :label-width="formLabelWidth">
+                                    <el-select v-model="BSform.value" placeholder="请选择">
+                                        <el-option v-for="item in BSform.BLCategory"
+                                                   :key="item.BLID"
+                                                   :label="item.BLName"
+                                                   :value="item.BLID">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-form>
+                            <div slot="footer" class="dialog-footer">
+                                <el-button v-on:click="dialogEdit = false">取 消</el-button>
+                                <el-button type="primary" v-on:click="EditSave">确 定</el-button>
+                            </div>
+                        </el-dialog>
+
+
+                        <el-dialog title="新增" :visible.sync="dialogAdd">
+                            <el-form :model="BSform">
+                                <el-form-item label="小类别名称" :label-width="formLabelWidth">
+                                    <el-input v-model="BSform.bsName" autocomplete="off"></el-input>
+                                </el-form-item>
+                                <el-form-item label="所属大类别" :label-width="formLabelWidth">
+                                    <el-select v-model="BSform.value" placeholder="请选择">
+                                        <el-option v-for="item in BSform.BLCategory"
+                                                   :key="item.BLID"
+                                                   :label="item.BLName"
+                                                   :value="item.BLID">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-form>
+                            <div slot="footer" class="dialog-footer">
+                                <el-button v-on:click="dialogAdd = false">取 消</el-button>
+                                <el-button type="primary" v-on:click="AddBSCategory">确 定</el-button>
+                            </div>
+                        </el-dialog>
+                    </div>
+                </el-tab-pane>
+            </el-tabs>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            //表格数据
+            tableData: [],
+            //分页
+            currentPage: 1,
+            pageSize: 6,
+            total: 20,
+            //下拉菜单数据
+            BLCategory: [],
+            value: '',
+            //编辑,新增
+            dialogEdit: false,
+            dialogAdd: false,
+            formLabelWidth: '120px',
+            //小类别对象
+            BSform: {
+                BSID: '',
+                bsName: '',
+                BLCategory: [],
+                value: ''
+            }
+        },
+        created() {
+            this.getBLCategory();
+            this.getBSCategory();
+        },
+        methods: {
+            AddBSCategory() {
+                var obj = new Object();
+                obj.BSName = this.BSform.bsName;
+                obj.BLID = this.BSform.value;
+                axios.post("AddBSCategory", { bs: obj })
+                    .then(res => {
+                        this.$message({
+                            type: 'success',
+                            message: '添加成功'
+                        });
+                        this.tableData = res.data;
+                        this.dialogAdd = false;
+                    })
+            },
+            //修改
+            Edit(row) {
+                this.dialogEdit = true
+                this.BSform.BSID = row.BSID
+                this.BSform.value = row.BLID
+                this.BSform.bsName = row.BSName
+            },
+            //保存修改
+            EditSave() {
+                var obj = new Object();
+                obj.BSID = this.BSform.BSID
+                obj.BLID = this.BSform.value
+                obj.BSName = this.BSform.bsName
+                console.log(obj)
+                axios.post("EditBSCategory", { bs: obj })
+                    .then(res => {
+                        this.$message({
+                            type: 'success',
+                            message: '修改成功!'
+                        });
+                        this.tableData = res.data,
+                            this.dialogEdit = false;
+                    })
+            },
+            //删除
+            Delete(row) {
+                this.$confirm('是否确定删除?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post("DelBSCategory", { id: row.BSID })
+                        .then(res => {
+                            if (res.data.num === -1) {
+                                this.$message({
+                                    type: 'error',
+                                    message: '已关联的数据不能删除'
+                                });
+                            } else {
+                                this.$message({
+                                    type: 'success',
+                                    message: '删除成功!'
+                                });
+                            }
+                            this.tableData = res.data.list
+                        })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            //查询所有小类别
+            getBSCategory() {
+                axios.get("GetBSCategoryAll", {}, {
+                    headers: {
+                    }
+                }).then(res => {
+                    //复制给tableData
+                    this.tableData = res.data
+                })
+            },
+            //查询
+            onSubmit() {
+                console.log(this.value)
+                axios.post("GetBSCategoryByBLID", { blid: this.value })
+                    .then(res => {
+                        this.tableData = res.data
+                    })
+            },
+            //获取所以大类别,绑定下拉菜单
+            getBLCategory() {
+                axios.get("GetBLCategoryAll", {}, {
+                    headers: {
+                    }
+                }).then(res => {
+                    this.BLCategory = res.data
+                    this.BSform.BLCategory = res.data
+                })
+            }
+            ,
+            //分页 分页条数
+            handleSizeChange(val) {
+                this.pageSize = val
+            },
+            //当前页
+            handleCurrentChange(val) {
+                this.currentPage = val
+            },
+        }
+    })
+</script>

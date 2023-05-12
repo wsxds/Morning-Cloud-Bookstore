@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/Css1.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+    <script src="~/Scripts/layer/layer.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div id="allDiv">
+            <!-- 头开始 -->
+            <div id="headDiv">
+                <div style="text-align:right">
+                    <div>
+                        欢迎光临本店
+                        @if (Session["user"] == null)
+                        {
+
+                            <a href="/UserBook/Login">登录</a>
+                            <a href="/UserBook/Region">注册</a>
+                        }
+                        else
+                        {
+                            Morning_Cloud_Bookstore.Models.Users user = Session["user"] as Morning_Cloud_Bookstore.Models.Users;
+                            <a href="">@user.UserNick</a>
+                            <a href="/UserBook/UserPage">修改密码</a>
+                            <a href="/UserBook/ZhuXiao">注销</a>
+                        }
+                    </div>
+                </div>
+                <div style="height:97px">
+                    <div style="float:left;width:250px">
+                        <img src="~/images/LogoUser.png" />
+                    </div>
+                    <div style="float:right;width:700px">
+                        <div style="float:right;border:1px solid #D5D5D5;height:40px;width:600px;text-align:right;margin:10px;padding:5px">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <input type="text" id="txtSelect" style="width:500px;height:25px;line-height:25px" />
+                                    </td>
+                                    <td>
+                                        <a id="sel"><img src="~/images/selectBtn.png" style="vertical-align:middle;cursor:pointer" /></a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div style="height:36px;background-color:#B80C0C;line-height:30px;color:White;font-weight:bold;font-size:14px">
+                    <table id="menuTable">
+                        <tr>
+                            <td style="text-align:center;padding-left:15px;padding-right:8px">
+                                <a href="/UserBook/Index">首页</a>
+                            </td>
+                            <td>
+                                <img src="~/images/line1.gif" style="vertical-align:middle" />
+                            </td>
+                            @foreach (var item in Session["Category"] as List<Morning_Cloud_Bookstore.Models.Model.BLCategoryModel>)
+                            {
+                                <td style="text-align:center;padding-left:15px;padding-right:8px" >
+                                    <a href="/UserBook/BookPageByBLid?blid=@item.BLID&&page=1"> @item.BLName</a>
+                                    <img src="~/images/line1.gif" style="vertical-align:middle" />
+                                </td>
+                            }
+
+
+
+                            <td style="text-align:center;padding-left:15px;padding-right:8px">
+                                <a href="#">帮助中心</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="height:30px;border:1px solid #BABABA;border-top-width:0px;line-height:30px;padding:0px 5px;text-align:right">
+                    <a href="/UserBook/flowPage"><img src="~/images/jiesuan.gif" style="vertical-align:middle;border:0px" /></a>
+                </div>
+                <p></p>
+            </div>
+            <!-- 头结束 -->
+            <!-- 左边开始 -->
+            <div id="leftDiv">
+                <div class="redAll">
+                    <div class="redTitle">所有书籍类别</div>
+                    <div style="background-color:#F5F5F5">
+                        @foreach (var item in Session["Category"] as List<Morning_Cloud_Bookstore.Models.Model.BLCategoryModel>)
+                        {
+                            <div style="color:Black;font-weight:bold;padding:0 5px;height:25px;line-height:25px;clear:both">
+                                <a href="/UserBook/BookPageByBLid?blid=@item.BLID&&page=1"> @item.BLName </a>
+                            </div>
+                            foreach (var bs in item.bslist)
+                            {
+                                <div style="padding:0 5px;height:25px;line-height:25px;float:left;">
+                                    <a href="/UserBook/BookPageByBSid?bsid=@bs.BSID&&page=1"> @bs.BSName </a>
+                                </div>
+                            }
+
+                            <hr style="width:90%;border:1px dashed #DDDDDD;clear:both" />
+                        }
+                    </div>
+                </div>
+                <p></p>
+                <div class="redAll">
+                    <div class="redTitle">畅销商品排行版</div>
+                    <div style="padding:5px 5px">
+                        @foreach (var item in Session["Book"] as List<Morning_Cloud_Bookstore.Models.Model.BooksModel>)
+                        {
+                            <table>
+                                <tr>
+                                    <td rowspan="3" style="width:20px;vertical-align:text-top;text-align:center">
+                                        <img src="@item.TopUrl" />
+                                    </td>
+                                    <td rowspan="3">
+                                        <a href="/UserBook/BookPage?id=@item.BookID">
+                                            <img src="@item.ImgUrl" style="border:0px;width:50px;height:50px" />
+                                        </a>
+                                    </td>
+                                    <td style="height:15px;line-height:15px">
+                                        <a href="/UserBook/BookPage?id=@item.BookID">@item.BookTitle</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height:15px;line-height:15px">
+                                        <font style="text-decoration:line-through"> @item.BookPrice  </font>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="height:15px;line-height:15px">
+                                        <font color="#FF7126" style="font-weight:bold"> @item.BookMoney  </font>
+                                    </td>
+                                </tr>
+                            </table>
+                            <hr style="width:90%;border:1px dashed #DDDDDD;clear:both" />
+                        }
+                    </div>
+                </div>
+                <p></p>
+            </div>
+            <!-- 左边结束 -->
+            @RenderBody()
+            <!--下部开始-->
+            <div id="footDiv">
+                <div style="height:10px"></div>
+                <div class="block">
+                    <div class="block">
+                        <div class="box">
+                            <div class="helpTitBg" style="clear:both">
+                                <dl style="border-right:1px solid #ccc;">
+                                    <dt>新手入门</dt>
+                                </dl>
+                                <dl style="border-right:1px solid #ccc;">
+                                    <dt>配送说明</dt>
+                                </dl>
+                                <dl style="border-right:1px solid #ccc;">
+                                    <dt>售后服务</dt>
+                                </dl>
+                                <dl style="border-right:1px solid #ccc;">
+                                    <dt>强强联手</dt>
+                                </dl>
+                                <dl>
+                                    <dt>关于我们</dt>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="height:10px"></div>
+                <div style="height:25px;line-height:25px;text-align:center;background-color:#BC1010">
+                    <a href="#" style="color:White;">给我们留言（希望您给我们提供宝贵的意见与建议，我们将不断改进，更好服务于大家!）</a>
+                </div>
+                <div style="height:10px"></div>
+                <div style="text-align:center">
+                    &copy; 2023 晨云书城 版权所有，并保留所有权利。
+                </div>
+            </div>
+            <!--下部结束-->
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    $("#sel").click(function () {
+        var name = $("#txtSelect").val()
+        location.href = "/UserBook/Selectpage?name=" + name + "&&page=" + 1;
+
+    })
+</script>
+@*<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            BLCategory: [],
+            BookBestSeller: [],
+            BookBuy: [],
+            BookHot: [],
+            BookPage: {}
+        },
+        created() {
+            this.getBLCategory()
+            this.getBookBestSeller()
+            this.getBookBuy()
+            this.getBookHot()
+        },
+        methods: {
+            //类别
+            getBLCategory() {
+                axios.get("/UserBook/GetBLCategoryAll")
+                    .then(res => {
+                        console.log(res.data)
+                        this.BLCategory = res.data
+                    })
+            },
+            //畅销
+            getBookBestSeller() {
+                axios.get("GetBookBestSeller")
+                    .then(res => {
+                        console.log(res.data);
+                        this.BookBestSeller = res.data
+                    })
+            },
+            //秒杀
+            getBookBuy() {
+                axios.get("GetBookBuy")
+                    .then(res => {
+                        console.log(res.data);
+                        this.BookBuy = res.data
+                    })
+            },
+            //热门
+            getBookHot() {
+                axios.post("GetBookHot")
+                    .then(res => {
+                        this.BookHot = res.data
+                    })
+            },
+            //详情
+            getBookPage(bookid) {
+                location.href = "/UserBook/BookPage?id=" + bookid
+            }
+        },
+    })
+</script>*@

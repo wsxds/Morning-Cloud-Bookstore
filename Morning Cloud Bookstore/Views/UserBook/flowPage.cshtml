@@ -1,0 +1,100 @@
+﻿
+@{
+    ViewBag.Title = "flowPage";
+    Layout = "~/Views/userBook_1.cshtml";
+}
+
+<!--中部开始-->
+<div>
+
+    <div style="background-color:#F6F6F6;color:Black;font-weight:bold;font-size:14px;height:30px;line-height:30px;padding:3px 10px">购物车 商品列表</div>
+    <p></p>
+    <div>
+        <table class="dataTable" cellspacing="0" border="1" style="width:98%;border-collapse:collapse">
+            <tr>
+                <th align="center" scope="col" style="height:30px;">商品名称</th>
+                <th align="center" scope="col">售价</th>
+                <th align="center" scope="col">折扣价</th>
+                <th align="center" scope="col">购买数量</th>
+                <th align="center" scope="col">小计</th>
+                <th align="center" scope="col">操作</th>
+            </tr>
+            @if (Session["list"] != null)
+            {
+                foreach (var item in Session["list"] as List<Morning_Cloud_Bookstore.Models.Model.BooksModel>)
+                {
+                    <tr>
+                        <td align="center" style="height:30px;">
+                            <a href="BooksPage" target="_blank">@item.BookTitle</a>
+                        </td>
+                        <td align="center" style="height:30px;">
+                            @item.BookPrice
+                        </td>
+                        <td align="center">
+                            @item.BookMoney
+                        </td>
+                        <td align="center">
+                            <a href="/UserBook/AddCount?id=@item.BookID"><input type="button" value="+" /></a>
+                            <span style="margin-left: 10px;margin-right: 10px;">@item.Count</span>
+                            <a href="/UserBook/JianCount?id=@item.BookID"><input type="button" value="-" /></a>
+                        </td>
+                        <td align="center">
+                            @item.XiaoJi
+                        </td>
+                        <td align="center">
+                            <a href="/UserBook/Del?id=@item.BookID"><input type="submit" value="删除" /></a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <th align="center" style="height:30px;" colspan="6">
+                        暂无数据
+                    </th>
+                </tr>
+            }
+        </table>
+    </div>
+    <p></p>
+    @if (Session["bookMoneyTotal"] != null)
+    {
+        <table class="dataTable" style="width:98%">
+            <tr>
+                <td style="width:400px;text-align:left;padding:0 5px;height:30px;line-height:30px">
+                    购物金额小计： <font color="#FF7126" style="font-weight:bold">￥@Session["bookMoneyTotal"]元</font> 比售价￥@Session["bookPriceTotal"]元 节省了 ￥@Session["Yh"]元
+                </td>
+            </tr>
+        </table>
+        <p></p>
+    }
+    else
+    {
+        <table class="dataTable" style="width:98%">
+            <tr>
+                <td style="width:400px;text-align:left;padding:0 5px;height:30px;line-height:30px">
+                    购物金额小计： <font color="#FF7126" style="font-weight:bold">￥0元</font> 比售价￥0元 节省了 ￥0元
+                </td>
+            </tr>
+        </table>
+        <p></p>
+    }
+
+    <table style="width:98%">
+        <tr>
+            <td style="text-align:left">
+                <a href="/UserBook/Index">
+                    <img src="~/images/goShop.png" style="border:0px" />
+                </a>
+            </td>
+            <td style="text-align:right">
+                <a href="/UserBook/BalancePage">
+                    <img src="~/images/goOrder.png" style="border:0px" />
+                </a>
+            </td>
+        </tr>
+    </table>
+
+</div>
+<!--中部结束-->

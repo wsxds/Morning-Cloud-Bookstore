@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="2b4b259616d04be7aa110e9c22190ae0" Name="Diagram1" ZoomLevel="86">
+        <EntityTypeShape EntityType="BooksDBModel.AddressManager" Width="1.5" PointX="7" PointY="4.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="BooksDBModel.Admins" Width="1.5" PointX="0.75" PointY="5.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="BooksDBModel.BLCategory" Width="1.5" PointX="0.75" PointY="7.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="BooksDBModel.BookAppraise" Width="1.5" PointX="2.875" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="BooksDBModel.Books" Width="1.5" PointX="2.875" PointY="7.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="BooksDBModel.BSCategory" Width="1.5" PointX="0.75" PointY="9.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="BooksDBModel.OrderDetail" Width="1.5" PointX="4.875" PointY="6" IsExpanded="true" />
+        <EntityTypeShape EntityType="BooksDBModel.Orders" Width="1.5" PointX="4.875" PointY="9.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="BooksDBModel.Users" Width="1.5" PointX="7" PointY="7.875" IsExpanded="true" />
+        <AssociationConnector Association="BooksDBModel.FK_ADDRESSM_REFERENCE_USERS" ManuallyRouted="false" />
+        <AssociationConnector Association="BooksDBModel.FK_BSCATEGO_REFERENCE_BLCATEGO" ManuallyRouted="false" />
+        <AssociationConnector Association="BooksDBModel.FK_BOOKAPPR_REFERENCE_ORDERDET" ManuallyRouted="false" />
+        <AssociationConnector Association="BooksDBModel.FK_BOOKS_REFERENCE_BSCATEGO" ManuallyRouted="false" />
+        <AssociationConnector Association="BooksDBModel.FK_ORDERDET_REFERENCE_BOOKS" ManuallyRouted="false" />
+        <AssociationConnector Association="BooksDBModel.FK_ORDERDET_REFERENCE_ORDERS" ManuallyRouted="false" />
+        <AssociationConnector Association="BooksDBModel.FK_ORDERS_REFERENCE_USERS" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

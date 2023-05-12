@@ -1,0 +1,89 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link href="~/Content/lib-master/theme-chalk/index.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script src="~/Content/lib-master/vue-2.6.12.js"></script>
+    <script src="~/Content/lib-master/index.js"></script>
+    <script src="~/Scripts/axios.js"></script>
+</head>
+<body>
+    <div id="app">
+        <el-tabs type="border-card">
+            <el-tab-pane>
+                <span slot="label"><i class="el-icon-notebook-1"></i> 用户信息</span>
+                <div id="content">
+                    <div id="Sel">
+                        <el-form :inline="true" :model="form" class="demo-form-inline">
+                            <el-form-item label="用户名">
+                                <el-input v-model="form.UserName" placeholder="用户名"></el-input>
+                            </el-form-item>
+                            <el-form-item label="昵称">
+                                <el-input v-model="form.UserNick" placeholder="昵称"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" v-on:click="onSubmit">查询</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                    <div id="table">
+                        <el-table :data="tableData" style="width: 100%" size="small ">
+                            <el-table-column fixed prop="UserID" label="用户编号" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="UserName" label="用户名" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="UserEmail" label="Email" width="200">
+                            </el-table-column>
+                            <el-table-column fixed prop="UserSex" label="性别" width="100">
+                            </el-table-column>
+                            <el-table-column fixed prop="UserNick" label="昵称" width="100">
+                            </el-table-column>
+                            <el-table-column fixed label="备注" width="200">
+                                <el-tag type="success">用户</el-tag>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+            </el-tab-pane>
+        </el-tabs>
+    </div>
+</body>
+</html>
+<script>
+    var Vue = new Vue({
+        el: "#app",
+        data: {
+            //表格数据
+            tableData: [],
+            form: {
+                UserName:"",
+                UserNick:"",
+            }
+        },
+        created() {
+            this.getUser()
+        },
+        methods: {
+            getUser() {
+                axios.get("GetUser")
+                    .then(res => {
+                        this.tableData = res.data;
+                })
+            },
+            onSubmit() {
+                axios.post("GetUserWhere", { name: this.form.UserName, nick: this.form.UserNick })
+                    .then(res => {
+                        this.tableData = res.data;
+                })
+            }
+        }
+    })
+</script>
